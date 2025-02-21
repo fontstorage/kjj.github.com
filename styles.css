@@ -1,0 +1,132 @@
+/* 重置浏览器默认样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+      border-collapse: collapse;
+      margin: 4px 0;
+      font-size: 12px;
+      background-color: #f4f4f4;
+}
+
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.switch-container {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.switch-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    outline: none;
+    font-size: 16px;
+}
+
+.switch-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+    background-color: #333;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 150px;
+}
+
+.switch-list li {
+    padding: 10px;
+}
+
+.switch-list a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.switch-list li:hover {
+    background-color: #444;
+}
+
+.switch-container:hover .switch-list {
+    display: block;
+}
+
+
+      .shortcut-table {
+            list-style: none;
+            padding: 0;
+            margin: 0 0px;
+            max-width: 900px;  /* 根据需要调整宽度 */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .shortcut-row {
+            display: flex;
+            padding: 0px 0;
+        }
+        .shortcut-row:last-child {
+            border-bottom: none;
+        }
+       .shortcut-cell-group {
+            display: flex;
+            flex: 1;
+            font-size: 12px;
+            justify-content: space-between;
+            padding: 0 0px;
+            margin: 4px;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+        .shortcut-cell {
+            flex: 1;
+            text-align: center;
+            padding: 4px;
+        }
+        .shortcut-key {
+            color: #333;
+        }
+        .shortcut-action {
+            font-weight: bold;
+            color: #007BFF;
+        }
+        /* 鼠标滑动改变背景颜色 */
+        .shortcut-cell-group:hover {
+            background-color: #e0f7fa; /* 浅蓝色背景 */
+        }
+        .shortcut-section-title {
+            border-bottom: 1px solid #ddd;
+            font-size: 14px; /* 设置字体大小为18px */
+            text-align: center; /* 设置文本居中 */
+            font-weight: bold;
+            color: #333;
+            margin-top: 4px;
+        }
+webkit-scrollbar, body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: transparent;
+}
