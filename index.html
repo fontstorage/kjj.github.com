@@ -1,1178 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>快捷键-ALAGONG</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌺 小红花看板</title>
 <link rel="shortcut icon" href="./favicon.ico"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            background: linear-gradient(145deg, #fde8e0 0%, #fce4d6 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .board {
+            background: #fffaf5;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1), inset 0 2px 4px #ffe9da;
+            width: 100%;
+            height: 100%;
+            padding: 16px 24px 20px;
+            border: 6px solid #ffc1a6;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 4px dotted #f9b8a0;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+        .title h1 {
+            font-size: 1.8rem;
+            color: #b3472b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 #ffe1d4;
+        }
+
+        /* 数量总计 — 去掉背景色和边框 */
+        .total-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #9e3d1e;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .total-badge .total-num {
+            font-size: 1.9rem;
+            color: #b6451c;
+            text-shadow: 1px 1px 0 #ffe1d4;
+            margin: 0 2px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .mode-badge {
+            background: #ffd9cc;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+            color: #a33f23;
+            font-size: 0.9rem;
+            border: 2px solid #ffad8a;
+            box-shadow: 0 3px 0 #b95c3e;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .mode-badge.admin-mode {
+            background: #c9e9d2;
+            border-color: #6abf8b;
+            box-shadow: 0 3px 0 #3e8e5e;
+            color: #23633c;
+        }
+
+        .password-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .password-area input {
+            padding: 7px 14px;
+            border-radius: 40px;
+            border: 2px solid #e5b8a3;
+            background: white;
+            font-size: 0.9rem;
+            width: 130px;
+            outline: none;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .password-area input:focus {
+            border-color: #ff9366;
+            box-shadow: 0 0 0 2px rgba(255, 147, 102, 0.3);
+        }
+        .btn {
+            border: none;
+            background: #f9b8a0;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #4e2a1b;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b46b50;
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 2px solid #ffefe3;
+            white-space: nowrap;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b46b50;
+        }
+        .btn.primary {
+            background: #ff9f7c;
+            box-shadow: 0 3px 0 #b3512e;
+            color: #2c150c;
+        }
+        .btn.success {
+            background: #a6d9b5;
+            box-shadow: 0 3px 0 #5f9c76;
+            color: #1a3d28;
+        }
+        .btn.danger {
+            background: #f4a2a2;
+            box-shadow: 0 3px 0 #b85454;
+            color: #3d1414;
+        }
+        .btn.small {
+            padding: 5px 14px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 0 #b46b50;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            transform: translateY(0);
+            box-shadow: 0 3px 0 #b46b50;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+
+        /* 主内容区 — 小红花靠顶显示 */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 12px 0 0 0;
+            gap: 16px;
+        }
+
+        /* 小红花网格容器 — 无背景无边框，间距加大 */
+        .flower-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px 30px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 8px 0;
+            min-height: 100px;
+            flex-shrink: 0;
+        }
+
+        .flower-icon {
+            font-size: 3.2rem;
+            line-height: 1;
+            filter: drop-shadow(2px 4px 4px rgba(200, 100, 50, 0.25));
+            transition: transform 0.1s;
+            display: inline-block;
+            animation: bloom 0.3s ease backwards;
+            flex-shrink: 0;
+        }
+        .flower-icon:hover {
+            transform: scale(1.12);
+        }
+        @keyframes bloom {
+            0% { transform: scale(0.6); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 无花时的状态 */
+        .no-flower {
+            font-size: 1.6rem;
+            color: #b28b7a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.7;
+            padding: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        .no-flower span {
+            font-size: 3.5rem;
+        }
+
+        /* 管理员操作栏 */
+        .admin-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: auto;
+            padding: 12px 20px;
+            background: #fdf1e7;
+            border-radius: 60px;
+            border: 2px solid #fadbc8;
+            flex-shrink: 0;
+            margin-bottom: 4px;
+        }
+        .admin-actions.hidden {
+            display: none;
+        }
+
+        /* 底部提示 */
+        .footer-note {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #b3856e;
+            font-style: italic;
+            border-top: 2px solid #ffe1d4;
+            padding-top: 10px;
+            flex-shrink: 0;
+            margin-top: 8px;
+        }
+
+        /* 滚动条美化 */
+        .main-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .main-area::-webkit-scrollbar-track {
+            background: #fce4d6;
+            border-radius: 10px;
+        }
+        .main-area::-webkit-scrollbar-thumb {
+            background: #f9b8a0;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .flower-grid {
+                gap: 30px 20px;
+            }
+            .flower-icon {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .board { padding: 12px 16px 16px; border-width: 4px; }
+            .title h1 { font-size: 1.4rem; flex-wrap: wrap; }
+            .total-badge { font-size: 1.1rem; }
+            .total-badge .total-num { font-size: 1.5rem; }
+            .flower-icon { font-size: 2.2rem; }
+            .flower-grid { gap: 24px 16px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .controls { justify-content: space-between; }
+            .password-area input { width: 100px; }
+        }
+    </style>
 </head>
 <body>
-
-<div class="content-wrapper">
-    <div id="page1" class="page active">
-
-
-   <ul class="shortcut-table">
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">多边形</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">挤出</div>
-                <div class="shortcut-cell shortcut-action">,</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">挤出选项</div>
-                <div class="shortcut-cell shortcut-action">Alt+,</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">分离</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+\</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">仅影响轴</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+U</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">倒角</div>
-                <div class="shortcut-cell shortcut-action">。</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">倒角选项</div>
-                <div class="shortcut-cell shortcut-action">Alt+。</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">分割</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+]</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">无约束</div>
-                <div class="shortcut-cell shortcut-action">Shitf+A</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">插入</div>
-                <div class="shortcut-cell shortcut-action">?</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">插入选项</div>
-                <div class="shortcut-cell shortcut-action">Alt+?</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">焊接</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+[</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">约束边</div>
-                <div class="shortcut-cell shortcut-action">Shitf+S</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">切角</div>
-                <div class="shortcut-cell shortcut-action">:</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">切角选项</div>
-                <div class="shortcut-cell shortcut-action">Alt+:</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">附加</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+P</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">约束法线</div>
-                <div class="shortcut-cell shortcut-action">Shitf+D</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">相似</div>
-                <div class="shortcut-cell shortcut-action">"</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">松弛</div>
-                <div class="shortcut-cell shortcut-action">I</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">轴居中</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+O</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">快速切片</div>
-                <div class="shortcut-cell shortcut-action">Shitf+G</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">连接点</div>
-                <div class="shortcut-cell shortcut-action">J</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">流连接</div>
-                <div class="shortcut-cell shortcut-action">\</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">快速循环</div>
-                <div class="shortcut-cell shortcut-action">O</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏未选定</div>
-                <div class="shortcut-cell shortcut-action">-</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">连接边</div>
-                <div class="shortcut-cell shortcut-action">H</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">翻转法线</div>
-                <div class="shortcut-cell shortcut-action">~</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">全部取消隐藏</div>
-                <div class="shortcut-cell shortcut-action">】</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏选定</div>
-                <div class="shortcut-cell shortcut-action">=</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">扩大选择</div>
-                <div class="shortcut-cell shortcut-action">←</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">收缩选择</div>
-                <div class="shortcut-cell shortcut-action">→</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">间隔点循环</div>
-                <div class="shortcut-cell shortcut-action">↓</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">间隔点环</div>
-                <div class="shortcut-cell shortcut-action">↑</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">插入顶点</div>
-                <div class="shortcut-cell shortcut-action">Alt+F</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">循环</div>
-                <div class="shortcut-cell shortcut-action">Alt+H</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">边桥</div>
-                <div class="shortcut-cell shortcut-action">Alt+S</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">间隔选点</div>
-                <div class="shortcut-cell shortcut-action">Alt+Y</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">环形</div>
-                <div class="shortcut-cell shortcut-action">Alt+J</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">插入循环</div>
-                <div class="shortcut-cell shortcut-action">Alt+G</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">面桥</div>
-                <div class="shortcut-cell shortcut-action">Alt+A</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">创建图形</div>
-                <div class="shortcut-cell shortcut-action">Alt+C</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">目标点焊接</div>
-                <div class="shortcut-cell shortcut-action">Alt+B</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">切割</div>
-                <div class="shortcut-cell shortcut-action">Alt+W</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">等值线显示</div>
-                <div class="shortcut-cell shortcut-action">Alt+L</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">增长环</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+,</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">塌陷</div>
-                <div class="shortcut-cell shortcut-action">Alt+V</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">封口</div>
-                <div class="shortcut-cell shortcut-action">Alt+D</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">NURMS</div>
-                <div class="shortcut-cell shortcut-action">Alt+K</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">增长循环</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+。</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">设置流</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+/</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">半透明显示</div>
-                <div class="shortcut-cell shortcut-action">Alt+X</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">软选择</div>
-                <div class="shortcut-cell shortcut-action">Alt+-</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">移除</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+退格</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">细分</div>
-                <div class="shortcut-cell shortcut-action">Shift+K</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">阵列</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Q</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑软选择</div>
-                <div class="shortcut-cell shortcut-action">Alt+=</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">移除循环</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+=</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">填充</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+0</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">重置变换</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+9</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">法线对齐</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+8</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">仅选择对象不移动</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+1</div>
-            </div>
-        </li>
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">样条线</div>
-                <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">融合</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+"</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">圆角</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+K</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">分离样条线</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+F</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">细化</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+R</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">焊接</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+:</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">轮廓</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+J</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">连接</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+H</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">附加</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+D</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">分离线段</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+D</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">修剪</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+G</div>
-            </div>
-</li>
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">平面化 / 坐标系 / 轴约束 / 组</div>
-        <div class="shortcut-row">
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">平面化X轴</div>
-                <div class="shortcut-cell shortcut-action">Alt+5</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">平面化Y轴</div>
-                <div class="shortcut-cell shortcut-action">Alt+6</div>
-            </div>
-     <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">平面化Z轴</div>
-                <div class="shortcut-cell shortcut-action">Alt+7</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">X轴约束</div>
-                <div class="shortcut-cell shortcut-action">X</div>
-            </div>
-</div>
-        </li>
-
-                  <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">平面化Z轴</div>
-                <div class="shortcut-cell shortcut-action">Alt+7</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">X轴约束</div>
-                <div class="shortcut-cell shortcut-action">X</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">Y轴约束</div>
-                <div class="shortcut-cell shortcut-action">Y</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">Z轴约束</div>
-                <div class="shortcut-cell shortcut-action">Z</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">成组</div>
-                <div class="shortcut-cell shortcut-action">0</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">打开组</div>
-                <div class="shortcut-cell shortcut-action">.</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">分离</div>
-                <div class="shortcut-cell shortcut-action">1</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">关闭组</div>
-                <div class="shortcut-cell shortcut-action">2</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">炸开</div>
-                <div class="shortcut-cell shortcut-action">3</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">坐标系-视图</div>
-                <div class="shortcut-cell shortcut-action">4</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">坐标系-局部</div>
-                <div class="shortcut-cell shortcut-action">5</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">坐标系-父对象</div>
-                <div class="shortcut-cell shortcut-action">6</div>
-            </div>
-        </li>
-
-           <li class="shortcut-section">
-            <div class="shortcut-section-title">转换模式</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转为可编辑样条线</div>
-                <div class="shortcut-cell shortcut-action">Alt+1</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转为可编辑多边形</div>
-                <div class="shortcut-cell shortcut-action">Alt+2</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转为可编辑网格</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+3</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转换到顶点</div>
-                <div class="shortcut-cell shortcut-action">Shitf+1</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转换到边</div>
-                <div class="shortcut-cell shortcut-action">Shitf+2</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">转换到面</div>
-                <div class="shortcut-cell shortcut-action">Shitf+3</div>
-            </div>
-        </li>
-
-           <li class="shortcut-section">
-            <div class="shortcut-section-title">拓扑工具</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">拓扑</div>
-                <div class="shortcut-cell shortcut-action">Shift+“”</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">延伸</div>
-                <div class="shortcut-cell shortcut-action">Shift+J</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">一致移动</div>
-                <div class="shortcut-cell shortcut-action">Shift+M</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">绘制连接</div>
-                <div class="shortcut-cell shortcut-action">Shitf+Z</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">阻力</div>
-                <div class="shortcut-cell shortcut-action">Shift+:</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">优化</div>
-                <div class="shortcut-cell shortcut-action">Shift+/</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">一致松弛</div>
-                <div class="shortcut-cell shortcut-action">Shift+,</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">推拉笔刷</div>
-                <div class="shortcut-cell shortcut-action">Shitf+V</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">步骤构建</div>
-                <div class="shortcut-cell shortcut-action">Shift+K</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">偏移</div>
-                <div class="shortcut-cell shortcut-action">Shift+。</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">一致</div>
-                <div class="shortcut-cell shortcut-action">Shift+N</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">距离连接</div>
-                <div class="shortcut-cell shortcut-action">Shitf+-</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">石墨拓扑界面</div>
-                <div class="shortcut-cell shortcut-action">8</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">自定义用户界面</div>
-                <div class="shortcut-cell shortcut-action">9</div>
-            </div>
-        </li>
-
-           <li class="shortcut-section">
-            <div class="shortcut-section-title">修改器命令</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">顶视图</div>
-                <div class="shortcut-cell shortcut-action">T</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">左视图</div>
-                <div class="shortcut-cell shortcut-action">L</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">前视图</div>
-                <div class="shortcut-cell shortcut-action">F</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">移动</div>
-                <div class="shortcut-cell shortcut-action">W</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">底视图</div>
-                <div class="shortcut-cell shortcut-action">B</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">右视图</div>
-                <div class="shortcut-cell shortcut-action">R</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">后视图</div>
-                <div class="shortcut-cell shortcut-action">U</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">旋转</div>
-                <div class="shortcut-cell shortcut-action">E</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">缩放</div>
-                <div class="shortcut-cell shortcut-action">R</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑多边形</div>
-                <div class="shortcut-cell shortcut-action">N</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">退出子层级</div>
-                <div class="shortcut-cell shortcut-action">Alt+M</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">对称</div>
-                <div class="shortcut-cell shortcut-action">Alt+I</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">涡轮平滑</div>
-                <div class="shortcut-cell shortcut-action">Y</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">对齐</div>
-                <div class="shortcut-cell shortcut-action">Alt+R</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">反选</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+I</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">渲染</div>
-                <div class="shortcut-cell shortcut-action">Shift+Q</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">挤出</div>
-                <div class="shortcut-cell shortcut-action">Alt+O</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">几何多边形</div>
-                <div class="shortcut-cell shortcut-action">Alt+U</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">组</div>
-                <div class="shortcut-cell shortcut-action">Alt+G</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">最大化显示</div>
-                <div class="shortcut-cell shortcut-action">Z</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">壳</div>
-                <div class="shortcut-cell shortcut-action">Alt+P</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">间隔工具</div>
-                <div class="shortcut-cell shortcut-action">Alt+I</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏灯光</div>
-                <div class="shortcut-cell shortcut-action">Shift+L</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">切换视口</div>
-                <div class="shortcut-cell shortcut-action">Q</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">镜像</div>
-                <div class="shortcut-cell shortcut-action">Alt+E</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">全选</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+A</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏相机</div>
-                <div class="shortcut-cell shortcut-action">Shift+C</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">缩放区域</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+W</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">环绕视图</div>
-                <div class="shortcut-cell shortcut-action">V</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">克隆</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+C</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">上一个修改器</div>
-                <div class="shortcut-cell shortcut-action">Shiftt+W</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示最终结果</div>
-                <div class="shortcut-cell shortcut-action">Shift+X</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">专家模式</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+X</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">保存文件</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+S</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">下一个修改器</div>
-                <div class="shortcut-cell shortcut-action">Shift+E</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">冻结</div>
-                <div class="shortcut-cell shortcut-action">6</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">解冻</div>
-                <div class="shortcut-cell shortcut-action">7</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏未选定对象</div>
-                <div class="shortcut-cell shortcut-action">7</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏选定对象</div>
-                <div class="shortcut-cell shortcut-action">9</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">全部取消隐藏</div>
-                <div class="shortcut-cell shortcut-action">0</div>
-            </div>
-</li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">子对象层级1</div>
-                <div class="shortcut-cell shortcut-action">1</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">子对象层级2</div>
-                <div class="shortcut-cell shortcut-action">2</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">子对象层级3</div>
-                <div class="shortcut-cell shortcut-action">3</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">子对象层级4</div>
-                <div class="shortcut-cell shortcut-action">4</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">变换GizmoX轴约束</div>
-                <div class="shortcut-cell shortcut-action">F5</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">变换GizmoY轴约束</div>
-                <div class="shortcut-cell shortcut-action">F6</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">变换GizmoZ轴约束</div>
-                <div class="shortcut-cell shortcut-action">F7</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">查看带边面切换</div>
-                <div class="shortcut-cell shortcut-action">F4</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">渲染</div>
-                <div class="shortcut-cell shortcut-action">F9</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">渲染设置</div>
-                <div class="shortcut-cell shortcut-action">F10</div>
-            </div>
-        </li>
-
-        <!-- 继续添加更多的.shortcut-row -->
-    </ul>
-
-</div>
-
-
-
-
-
-
-    <div id="page2" class="page">
-
-  <ul class="shortcut-table">
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">显示隐藏类（3D窗口）</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示渲染厚度</div>
-                <div class="shortcut-cell shortcut-action">Alt+1</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示正面背面</div>
-                <div class="shortcut-cell shortcut-action">Alt+3</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">半透明显示</div>
-                <div class="shortcut-cell shortcut-action">Alt+4</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏/显示模特</div>
-                <div class="shortcut-cell shortcut-action">Shift+A</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏选择的板片</div>
-                <div class="shortcut-cell shortcut-action">Shift+Q</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示所有板片</div>
-                <div class="shortcut-cell shortcut-action">Shift+C</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示所有尺寸</div>
-                <div class="shortcut-cell shortcut-action">Shift+Z</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示模特的安排点</div>
-                <div class="shortcut-cell shortcut-action">Shitf+F</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示/隐藏骨骼</div>
-                <div class="shortcut-cell shortcut-action">Shift+X</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">反激活开关</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+J</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">冷冻开关</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+K</div>
-            </div>
-        </li>
-
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">编辑类（2D窗口）</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑板片</div>
-                <div class="shortcut-cell shortcut-action">A</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑点线</div>
-                <div class="shortcut-cell shortcut-action">Z</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑曲线</div>
-                <div class="shortcut-cell shortcut-action">C</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑曲线点</div>
-                <div class="shortcut-cell shortcut-action">V</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">线上加点</div>
-                <div class="shortcut-cell shortcut-action">X</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">板片加内部线</div>
-                <div class="shortcut-cell shortcut-action">G</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">编辑缝线</div>
-                <div class="shortcut-cell shortcut-action">B</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">实例镜像所选板片</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+D</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">按住W键不松</div>
-                <div class="shortcut-cell shortcut-action">鼠标左键为 固定针</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">自由缝线时按住Shift不松</div>
-                <div class="shortcut-cell shortcut-action">将多段线当做一段线</div>
-            </div>
-</li>
-</ul>
-</div>
-
-
-
-
-    <div id="page3" class="page">
-
-<ul class="shortcut-table">
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">基础菜单和命令</div>
-                   <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">工具</div>
-                <div class="shortcut-cell shortcut-action">F1</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔刷</div>
-                <div class="shortcut-cell shortcut-action">F2</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔触</div>
-                <div class="shortcut-cell shortcut-action">F3</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">Alphas</div>
-                <div class="shortcut-cell shortcut-action">F4</div>
-            </div>
-</li>
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">纹理</div>
-                <div class="shortcut-cell shortcut-action">F5</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">材质</div>
-                <div class="shortcut-cell shortcut-action">F6</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">工具菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F1</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔刷菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F2</div>
-            </div>
-</li>
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔触菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F3</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">Alpha菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F4</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">纹理菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F5</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">材质菜单</div>
-                <div class="shortcut-cell shortcut-action">Shift+F6</div>
-            </div>
-</li>
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显示快捷菜单</div>
-                <div class="shortcut-cell shortcut-action">空格</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">显/隐浮动面板</div>
-                <div class="shortcut-cell shortcut-action">Tab</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">映射大师</div>
-                <div class="shortcut-cell shortcut-action">G</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">ZMaooer</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+G</div>
-            </div>
-</li>
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">填充层</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+F</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">打开文件</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+O</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">保存文件</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+S</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔刷大小</div>
-                <div class="shortcut-cell shortcut-action">S</div>
-            </div>
-</li>
-     <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">焦点调节</div>
-                <div class="shortcut-cell shortcut-action">O</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">色彩强度</div>
-                <div class="shortcut-cell shortcut-action">I</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">Z强度</div>
-                <div class="shortcut-cell shortcut-action">U</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">透视视图</div>
-                <div class="shortcut-cell shortcut-action">P</div>
-            </div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔刷增大10单位</div>
-                <div class="shortcut-cell shortcut-action">】</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">笔刷缩小10单位</div>
-                <div class="shortcut-cell shortcut-action">【</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">撤销</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Z</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">重做</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Shitf+Z</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">清理图层</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+N</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">填充图层</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+F</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">烘焙图层</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+B</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">放置标记</div>
-                <div class="shortcut-cell shortcut-action">M</div>
-            </div>
-        </li>
-
-
-        <li class="shortcut-row">
-
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">移除标记</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+M</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">渲染所有</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Shift+R</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">鼠标指针选择渲染</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+R</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">开启模板</div>
-                <div class="shortcut-cell shortcut-action">Alt+H</div>
-            </div>
-        </li>
-
-                <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">隐藏/显示模板</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+H</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">图形控制器</div>
-                <div class="shortcut-cell shortcut-action">空格</div>
-            </div>
-
-        </li>
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">纹理面板</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">CropAndfill</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Shift+F</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">文档中的Grb纹理</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Shift+G</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">存储工具</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+Shift+T</div>
-            </div>
-            </div>
-        </li>
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">几何体</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">细分</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+D</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">上一级细分</div>
-                <div class="shortcut-cell shortcut-action">Shift+D</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">下一级细分</div>
-                <div class="shortcut-cell shortcut-action">D</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">边缘加环</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+E</div>
-            </div>
-        </li>
-
-        <li class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">切入/切出HD雕刻模式</div>
-                <div class="shortcut-cell shortcut-action">A</div>
-            </div>
-        </li>
-
-        <li class="shortcut-section">
-            <div class="shortcut-section-title">缩放面板</div>
-        <div class="shortcut-row">
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">实际大小</div>
-                <div class="shortcut-cell shortcut-action">0</div>
-            </div>
-            <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">抗锯齿一般大小</div>
-                <div class="shortcut-cell shortcut-action">Ctrl+0</div>
-            </div>
-    <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">放大</div>
-                <div class="shortcut-cell shortcut-action">+</div>
-            </div>
- <div class="shortcut-cell-group">
-                <div class="shortcut-cell shortcut-key">缩小</div>
-                <div class="shortcut-cell shortcut-action">-</div>
-            </div>
-        </li>
-</ul>
-</div>
-
-    <div id="page4" class="page"></div>
-
-<div class="switch-container">
-    <button class="switch-button" id="switchButton">≡</button>
-    <ul class="switch-list" id="switchList">
-        <li><a href="#" data-page="page1">3DsMax</a></li>
-        <li><a href="#" data-page="page2">Marvelous Designer</a></li>
-        <li><a href="#" data-page="page3">ZBrush</a></li>
-        <li><a href="#" data-page="page4">Blank Page</a></li>
-    </ul>
-</div>
-
-<script src="script.js"></script>
+    <div class="board">
+        <!-- 顶部工具栏 -->
+        <div class="toolbar">
+            <div class="title">
+                <h1>
+                    小红花看板
+                    <span class="total-badge">
+                        总计 <span id="totalCount" class="total-num">0</span> 朵
+                    </span>
+                </h1>
+            </div>
+            <div class="controls">
+                <div id="modeBadge" class="mode-badge">
+                    👀 游客模式
+                </div>
+                <div class="password-area">
+                    <input type="password" id="passwordInput" placeholder="密码" value="">
+                    <button class="btn primary" id="loginBtn">登录</button>
+                    <button class="btn small" id="logoutBtn" style="display: none;">退出</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 — 小红花靠顶显示 -->
+        <div class="main-area">
+            <!-- 小红花排列区（无背景无边框，大间距） -->
+            <div id="flowerGrid" class="flower-grid">
+                <!-- 动态渲染小红花 -->
+            </div>
+
+            <!-- 管理员操作栏 -->
+            <div id="adminActions" class="admin-actions hidden">
+                <button class="btn success" id="addOneBtn">➕ 增加一朵小红花</button>
+                <button class="btn danger" id="subOneBtn">➖ 减少一朵小红花</button>
+                <button class="btn danger" id="resetBtn">🔄 重置为0</button>
+            </div>
+        </div>
+
+        <!-- 底部说明 -->
+        <div class="footer-note">
+            🌟 每一朵小红花都是成长的鼓励 🌟
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 配置 ----------
+            const ADMIN_PASSWORD = "2021";   // 可修改密码
+
+            // ---------- 数据 ----------
+            let flowerCount = 0;
+
+            // 从 localStorage 读取
+            function loadData() {
+                const stored = localStorage.getItem('singleFlowerCount');
+                if (stored) {
+                    try {
+                        const parsed = parseInt(stored, 10);
+                        if (!isNaN(parsed) && parsed >= 0) {
+                            flowerCount = parsed;
+                        }
+                    } catch (e) {
+                        // 使用默认0
+                    }
+                }
+                if (typeof flowerCount !== 'number' || flowerCount < 0 || isNaN(flowerCount)) {
+                    flowerCount = 0;
+                }
+            }
+
+            function saveData() {
+                localStorage.setItem('singleFlowerCount', flowerCount.toString());
+            }
+
+            // ---------- 状态 ----------
+            let isAdmin = false;
+
+            // ---------- DOM 元素 ----------
+            const modeBadge = document.getElementById('modeBadge');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const flowerGrid = document.getElementById('flowerGrid');
+            const adminActions = document.getElementById('adminActions');
+            const addOneBtn = document.getElementById('addOneBtn');
+            const subOneBtn = document.getElementById('subOneBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const totalCountEl = document.getElementById('totalCount');
+
+            // ---------- 渲染 ----------
+            function render() {
+                // 更新角色UI
+                if (isAdmin) {
+                    modeBadge.textContent = '👑 管理员模式';
+                    modeBadge.classList.add('admin-mode');
+                    loginBtn.style.display = 'none';
+                    logoutBtn.style.display = 'inline-flex';
+                    adminActions.classList.remove('hidden');
+                    passwordInput.disabled = true;
+                    passwordInput.value = '';
+                    passwordInput.placeholder = '已登录';
+                } else {
+                    modeBadge.textContent = '👀 游客模式';
+                    modeBadge.classList.remove('admin-mode');
+                    loginBtn.style.display = 'inline-flex';
+                    logoutBtn.style.display = 'none';
+                    adminActions.classList.add('hidden');
+                    passwordInput.disabled = false;
+                    passwordInput.placeholder = '密码';
+                }
+
+                // 更新总计数量（标题徽章）
+                totalCountEl.textContent = flowerCount;
+
+                // 渲染小红花 (一朵朵显示)
+                const count = flowerCount;
+                const MAX_DISPLAY = 200;
+
+                if (count === 0) {
+                    flowerGrid.innerHTML = `
+                        <div class="no-flower">
+                            <span>🌱</span>
+                            还没有小红花，加油哦！
+                        </div>
+                    `;
+                } else {
+                    const displayCount = Math.min(count, MAX_DISPLAY);
+                    let flowersHtml = '';
+                    for (let i = 0; i < displayCount; i++) {
+                        flowersHtml += `<span class="flower-icon" style="animation-delay: ${i * 0.015}s">🌺</span>`;
+                    }
+                    if (count > MAX_DISPLAY) {
+                        flowersHtml += `<span class="flower-icon" style="opacity:0.7; font-size:2.6rem;">…</span>`;
+                    }
+                    flowerGrid.innerHTML = flowersHtml;
+                }
+            }
+
+            // ---------- 事件处理 ----------
+            function handleLogin() {
+                const pwd = passwordInput.value.trim();
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    render();
+                    passwordInput.value = '';
+                } else {
+                    alert('密码错误，请重试～ (提示: 柠檬生日年份)');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+
+            function handleLogout() {
+                isAdmin = false;
+                render();
+            }
+
+            function addOne() {
+                if (!isAdmin) return;
+                flowerCount += 1;
+                saveData();
+                render();
+            }
+
+            function subOne() {
+                if (!isAdmin) return;
+                if (flowerCount > 0) {
+                    flowerCount -= 1;
+                    saveData();
+                    render();
+                } else {
+                    alert('小红花不能是负数啦～');
+                }
+            }
+
+            function resetCount() {
+                if (!isAdmin) return;
+                if (confirm('确定要把小红花重置为 0 吗？')) {
+                    flowerCount = 0;
+                    saveData();
+                    render();
+                }
+            }
+
+            // ---------- 初始化 ----------
+            function init() {
+                loadData();
+                isAdmin = false;
+                render();
+
+                loginBtn.addEventListener('click', handleLogin);
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+                logoutBtn.addEventListener('click', handleLogout);
+
+                addOneBtn.addEventListener('click', addOne);
+                subOneBtn.addEventListener('click', subOne);
+                resetBtn.addEventListener('click', resetCount);
+            }
+
+            init();
+        })();
+    </script>
 </body>
 </html>
